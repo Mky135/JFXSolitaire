@@ -1,14 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="solitaire.controlers.MainController"
-            prefHeight="400.0" prefWidth="600.0">
 
+<AnchorPane prefHeight="500.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="solitaire.controlers.MainController">
+   <children>
+      <ToolBar prefHeight="50.0" prefWidth="600.0">
+        <items>
+          <Button mnemonicParsing="false" text="Button" />
+        </items>
+      </ToolBar>
+      <AnchorPane layoutY="50.0" prefHeight="450.0" prefWidth="600.0">
+         <children>
+            <ImageView fitHeight="52.0" fitWidth="34.0" layoutX="20.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" fx:id="heartsSlot"/>
+            <ImageView fitHeight="52.0" fitWidth="34.0" layoutX="64.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" fx:id="diamondsSlot"/>
+            <ImageView fitHeight="52.0" fitWidth="34.0" layoutX="108.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" fx:id="clubsSlot"/>
+            <ImageView fitHeight="52.0" fitWidth="34.0" layoutX="152.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" fx:id="spadesSlot"/>
+            <ImageView fitHeight="52.0" fitWidth="34.0" layoutX="468.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" fx:id="drawn1"/>
+            <ImageView fitHeight="52.0" fitWidth="34.0" layoutX="485.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" fx:id="drawn2"/>
+            <ImageView fitHeight="52.0" fitWidth="34.0" layoutX="502.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" fx:id="drawn3"/>
+            <ImageView fitHeight="52.0" fitWidth="34.0" layoutX="546.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" fx:id="drawPile"/>
+         </children>
+      </AnchorPane>
+   </children>
 </AnchorPane>
