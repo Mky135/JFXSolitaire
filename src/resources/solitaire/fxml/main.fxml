@@ -15,7 +15,7 @@
           <Button mnemonicParsing="false" text="Button" />
         </items>
       </ToolBar>
-      <AnchorPane layoutY="50.0" prefHeight="450.0" prefWidth="600.0">
+      <AnchorPane layoutY="50.0" prefHeight="450.0" prefWidth="600.0" fx:id="gameBoard">
          <children>
             <ImageView fitHeight="52.0" fitWidth="34.0" layoutX="20.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" fx:id="heartsSlot"/>
             <ImageView fitHeight="52.0" fitWidth="34.0" layoutX="64.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" fx:id="diamondsSlot"/>
