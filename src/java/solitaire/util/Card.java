@@ -6,9 +6,12 @@ import solitaire.Main;
 class Card
 {
     private Image image;
+    private Image back;
     private Value value;
     private Suit suit;
     private Color color;
+    private Column column;
+    private boolean facing;
 
     Card(Value value, Suit suit)
     {
@@ -16,11 +19,36 @@ class Card
         this.value = value;
         this.suit = suit;
         this.color = Color.getValue(suit);
+        this.back = new Image(String.valueOf(Main.class.getResource(Main.back)),68, 104, true, true, false);
+        this.facing = false;
     }
 
-    public Image getImage()
+    void setColumn(Column column)
     {
-        return image;
+        this.column = column;
+    }
+
+    Column getColumn()
+    {
+        return column;
+    }
+
+    Image getImage()
+    {
+        if(!facing)
+            return back;
+        else
+            return image;
+    }
+
+    boolean isFacing()
+    {
+        return facing;
+    }
+
+    void setFacing(boolean facing)
+    {
+        this.facing = facing;
     }
 
     void setImage(Image image)
