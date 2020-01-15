@@ -12,6 +12,7 @@ class Card
     private Color color;
     private Column column;
     private boolean facing;
+    private boolean inSlot;
 
     Card(Value value, Suit suit)
     {
@@ -41,9 +42,14 @@ class Card
             return image;
     }
 
-    boolean isFacing()
+    void setInSlot(boolean inSlot)
     {
-        return facing;
+        this.inSlot = inSlot;
+    }
+
+    boolean inSlot()
+    {
+        return inSlot;
     }
 
     void setFacing(boolean facing)
@@ -108,5 +114,11 @@ class Card
         }
         image += "/" + value.value + suit.suit + ".png";
         return new Image(String.valueOf(Main.class.getResource(image)), 68, 104, true, true, false);
+    }
+
+    @Override
+    public String toString()
+    {
+        return value.num + suit.suit;
     }
 }

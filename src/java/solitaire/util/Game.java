@@ -1,16 +1,18 @@
 package solitaire.util;
 
+import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
+import javafx.scene.Cursor;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Game
 {
     private int gameBoardWidth;
-    private int separatorWidth = 20;
+    private int separatorWidth = 30;
 
     private Column column1;
     private Column column2;
@@ -26,8 +28,9 @@ public class Game
 
     private ArrayList<Card> cards;
     public ArrayList<ImageView> onField = new ArrayList<>();
-    private HashMap<Card, ImageView> cardImageViewHashMap = new HashMap<>();
+    private Map<Card, ImageView> cardImageViewHashMap = new HashMap<>();
     public ArrayList<ImageView> drawPile = new ArrayList<>();
+    public ArrayList<Column> columns = new ArrayList<>();
 
     public Game(int gameBoardWidth)
     {
@@ -40,20 +43,25 @@ public class Game
         column5 = new Column(5, 0, 150, (Card) null);
         column6 = new Column(6, 0, 150, (Card) null);
         column7 = new Column(7, 0, 150, (Card) null);
+        columns.add(column1); columns.add(column2); columns.add(column3); columns.add(column4); columns.add(column5); columns.add(column6); columns.add(column7);
         initCards();
         initPoints();
         init();
     }
 
+    boolean dragging = false;
+
     private ImageView setImageViewer(Card card, Point2D point)
     {
         ImageView imageView = new ImageView(card.getImage());
         imageView.setOnMouseClicked(event -> {
+            if(!dragging)
             switch(card.getSuit())
             {
                 case HEART:
                     if(heartsSlot.updateValue(card))
                     {
+                        card.setInSlot(true);
                         imageView.setX(heartsSlot.getX());
                         imageView.setY(heartsSlot.getY());
                         turnUnderneath(card);
@@ -62,6 +70,7 @@ public class Game
                 case SPADE:
                     if(spadesSlot.updateValue(card))
                     {
+                        card.setInSlot(true);
                         imageView.setX(spadesSlot.getX());
                         imageView.setY(spadesSlot.getY());
                         turnUnderneath(card);
@@ -70,6 +79,7 @@ public class Game
                 case DIAMOND:
                     if(diamondsSlot.updateValue(card))
                     {
+                        card.setInSlot(true);
                         imageView.setX(diamondsSlot.getX());
                         imageView.setY(diamondsSlot.getY());
                         turnUnderneath(card);
@@ -78,6 +88,7 @@ public class Game
                 case CLUB:
                     if(clubsSlot.updateValue(card))
                     {
+                        card.setInSlot(true);
                         imageView.setX(clubsSlot.getX());
                         imageView.setY(clubsSlot.getY());
                         turnUnderneath(card);
@@ -87,14 +98,60 @@ public class Game
         });
         imageView.setX(point.getX());
         imageView.setY(point.getY());
+
+        AtomicReference<Double> xError = new AtomicReference<>((double) 0);
+        AtomicReference<Double> yError = new AtomicReference<>((double) 0);
+        imageView.setOnMousePressed(event -> {
+                // record a delta distance for the drag and drop operation.
+                dragging = true;
+                imageView.toFront();
+                imageView.setCursor(Cursor.MOVE);
+                xError.set(event.getSceneX() - imageView.getX());
+                yError.set((event.getSceneY()-50) - imageView.getY());
+        });
+        EventHandler<MouseEvent> setCursorHand = event -> imageView.setCursor(Cursor.HAND);
+        imageView.setOnMouseReleased(event -> {
+            dragging = false;
+            imageView.setCursor(Cursor.HAND);
+            checkCollision(imageView, event.getSceneX());
+        });
+
+        imageView.setOnMouseDragged(event -> {
+            if(dragging)
+            {
+                imageView.setX(event.getSceneX() - xError.get());
+                imageView.setY((event.getSceneY()-50) - yError.get());
+            }
+        });
+
+        imageView.setOnMouseEntered(setCursorHand);
+
         return imageView;
     }
+
+    private void checkCollision(ImageView imageView, double x)
+    {
+        double tolerance = 68;
+
+        for(Column column : columns)
+        {
+            if(x >= column.getX() && x <= column.getX() + tolerance)
+            {
+                imageView.setX(column.getX());
+                imageView.setY(cardImageViewHashMap.get(
+                        column.cards.get(column.cards.size()-1))
+                                                   .getY()+separatorWidth);
+                break;
+            }
+        }
+    }
+
 
     private void turnUnderneath(Card card)
     {
        if(card.getColumn().equals(column1))
        {
-           column1.cards.remove(card);
+           removeCardFromColumn(card, column1);
        }
        else if(card.getColumn().equals(column2))
        {
@@ -125,8 +182,11 @@ public class Game
     private void removeCardFromColumn(Card card, Column column)
     {
         column.cards.remove(card);
-        column.cards.get(column.cards.size()-1).setFacing(true);
-        cardImageViewHashMap.get(column.cards.get(column.cards.size()-1)).setImage(column.cards.get(column.cards.size()-1).getImage());
+        if(column.cards.size() != 1)
+        {
+            column.cards.get(column.cards.size() - 1).setFacing(true);
+            cardImageViewHashMap.get(column.cards.get(column.cards.size() - 1)).setImage(column.cards.get(column.cards.size() - 1).getImage());
+        }
     }
 
     private void initPoints()
@@ -188,9 +248,8 @@ public class Game
             if(i < 1)
             {
                 cards.get(i).setFacing(true);
-                column1.addToCards(cards.get(i));
-                cards.get(i).setColumn(column1);
-                onField.add(setImageViewer(cards.get(i), column1.getPoint()));
+                ImageView imageView = setImageViewer(cards.get(i), column1.getPoint());
+                addCardToField(i, imageView, column1);
             }
             else if(i < 3)
             {

@@ -15,7 +15,10 @@ public class Column
     {
         this.size = size;
         this.point = point;
-        this.cards.addAll(Arrays.asList(cards));
+        if(cards != null)
+        {
+            this.cards.addAll(Arrays.asList(cards));
+        }
     }
 
     public Column(int size, int x, int y, Card... cards)
@@ -36,6 +39,11 @@ public class Column
     double getY()
     {
         return point.getY();
+    }
+
+    double getX()
+    {
+        return point.getX();
     }
 
     public void addToCards(Card card)
