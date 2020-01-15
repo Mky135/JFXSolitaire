@@ -113,7 +113,7 @@ public class Game
         imageView.setOnMouseReleased(event -> {
             dragging = false;
             imageView.setCursor(Cursor.HAND);
-            checkCollision(imageView, card, event.getSceneX(), new Point2D(pastX.get(), pastY.get()));
+            checkCollision(imageView, card, event.getSceneX(), event.getSceneY()-50, new Point2D(pastX.get(), pastY.get()));
         });
 
         imageView.setOnMouseDragged(event -> {
@@ -129,20 +129,22 @@ public class Game
         return imageView;
     }
 
-    private void checkCollision(ImageView imageView, Card card, double x, Point2D pastPosition)
+    private void checkCollision(ImageView imageView, Card card, double x, double y, Point2D pastPosition)
     {
         double tolerance = 68;
 
         for(Column column : columns)
         {
-            if(x >= column.getX() && x <= column.getX() + tolerance)
+            System.out.println(column.cards);
+            if(x >= column.getX() && x <= column.getX() + tolerance && y>=150)
             {
-                if(column.cards.get(column.cards.size()-1).canPutBelow(card))
+                if((column.cards.size() != 1 && column.cards.get(column.cards.size() - 1).canPutBelow(card)) || (card.getValue() == Value.KING && column.cards.get(column.cards.size() - 1) == null))
                 {
                     imageView.setX(column.getX());
-                    imageView.setY(cardImageViewHashMap.get(
+                    imageView.setY(column.cards.size() != 1 ? cardImageViewHashMap.get(
                             column.cards.get(column.cards.size() - 1))
-                                                       .getY() + separatorWidth);
+                                                       .getY() + separatorWidth : column.getY());
+                    column.cards.add(card);
                     turnUnderneath(card);
                 }
                 else

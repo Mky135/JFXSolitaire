@@ -78,6 +78,8 @@ class Card
             case "H":
                 image = "hearts";
                 break;
+            case "N":
+                image = null;
         }
         image += "/" + value.value + suit.suit + ".png";
         return new Image(String.valueOf(Main.class.getResource(image)), 68, 104, true, true, false);

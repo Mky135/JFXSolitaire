@@ -2,7 +2,7 @@ package solitaire.util;
 
 public enum Suit
 {
-    CLUB("C"), HEART("H"), DIAMOND("D"), SPADE("S");
+    CLUB("C"), HEART("H"), DIAMOND("D"), SPADE("S"), NONE("N");
 
     public static Suit getValue(int i)
     {

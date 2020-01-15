@@ -12,7 +12,7 @@
    <children>
       <ToolBar prefHeight="50.0" prefWidth="600.0">
         <items>
-          <Button mnemonicParsing="false" text="Button" />
+          <Button mnemonicParsing="false" text="New Game" onAction="#reset" fx:id="reset"/>
         </items>
       </ToolBar>
       <AnchorPane layoutY="50.0" prefHeight="450.0" prefWidth="600.0" fx:id="gameBoard">
