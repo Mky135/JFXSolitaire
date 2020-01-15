@@ -2,21 +2,19 @@ package solitaire.util;
 
 import javafx.geometry.Point2D;
 
-public class Slot
+class Slot
 {
     private Value value = Value.EMPTY;
-    private Suit suit;
     private Point2D point;
 
-    private Slot(Suit suit, Point2D point2D)
+    private Slot(Point2D point2D)
     {
-        this.suit = suit;
         this.point = point2D;
     }
 
-    Slot(Suit suit, int x, int y)
+    Slot(int x, int y)
     {
-        this(suit, new Point2D(x, y));
+        this(new Point2D(x, y));
     }
 
     private Point2D getPoint()

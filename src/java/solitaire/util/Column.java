@@ -5,13 +5,13 @@ import javafx.geometry.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Column
+class Column
 {
     private int size;
     private Point2D point;
     ArrayList<Card> cards = new ArrayList<>();
 
-    public Column(int size, Point2D point,Card... cards)
+    Column(int size, Point2D point,Card... cards)
     {
         this.size = size;
         this.point = point;
@@ -21,7 +21,7 @@ public class Column
         }
     }
 
-    public Column(int size, int x, int y, Card... cards)
+    Column(int size, int x, int y, Card... cards)
     {
         this(size, new Point2D(x,y), cards);
     }
@@ -46,7 +46,7 @@ public class Column
         return point.getX();
     }
 
-    public void addToCards(Card card)
+    void addToCards(Card card)
     {
         cards.add(card);
     }

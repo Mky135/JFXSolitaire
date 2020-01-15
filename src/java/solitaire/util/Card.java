@@ -12,7 +12,6 @@ class Card
     private Color color;
     private Column column;
     private boolean facing;
-    private boolean inSlot;
 
     Card(Value value, Suit suit)
     {
@@ -42,24 +41,9 @@ class Card
             return image;
     }
 
-    void setInSlot(boolean inSlot)
+    void setFacing()
     {
-        this.inSlot = inSlot;
-    }
-
-    boolean inSlot()
-    {
-        return inSlot;
-    }
-
-    void setFacing(boolean facing)
-    {
-        this.facing = facing;
-    }
-
-    void setImage(Image image)
-    {
-        this.image = image;
+        this.facing = true;
     }
 
     Value getValue()
@@ -67,31 +51,14 @@ class Card
         return value;
     }
 
-    private void setValue(Value value)
-    {
-        this.value = value;
-    }
-
-
     Suit getSuit()
     {
         return suit;
     }
 
-    private void setSuit(Suit suit)
+    boolean canPutBelow(Card card)
     {
-        this.suit = suit;
-    }
-
-
-    private Color getColor()
-    {
-        return color;
-    }
-
-    private void setColor(Color color)
-    {
-        this.color = color;
+        return card.value.num == this.value.num-1 && card.color != this.color;
     }
 
     private Image getImage(Value value, Suit suit)

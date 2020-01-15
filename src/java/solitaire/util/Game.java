@@ -13,6 +13,7 @@ public class Game
 {
     private int gameBoardWidth;
     private int separatorWidth = 30;
+    private boolean dragging = false;
 
     private Column column1;
     private Column column2;
@@ -21,16 +22,16 @@ public class Game
     private Column column5;
     private Column column6;
     private Column column7;
-    private Slot heartsSlot = new Slot(Suit.HEART, 20, 10);
-    private Slot diamondsSlot = new Slot(Suit.DIAMOND, 108,10);
-    private Slot clubsSlot = new Slot(Suit.CLUB,196,10);
-    private Slot spadesSlot = new Slot(Suit.SPADE,284,10);
+    private Slot heartsSlot = new Slot(20, 10);
+    private Slot diamondsSlot = new Slot( 108,10);
+    private Slot clubsSlot = new Slot(196,10);
+    private Slot spadesSlot = new Slot(284,10);
 
     private ArrayList<Card> cards;
     public ArrayList<ImageView> onField = new ArrayList<>();
     private Map<Card, ImageView> cardImageViewHashMap = new HashMap<>();
     public ArrayList<ImageView> drawPile = new ArrayList<>();
-    public ArrayList<Column> columns = new ArrayList<>();
+    private ArrayList<Column> columns = new ArrayList<>();
 
     public Game(int gameBoardWidth)
     {
@@ -49,8 +50,6 @@ public class Game
         init();
     }
 
-    boolean dragging = false;
-
     private ImageView setImageViewer(Card card, Point2D point)
     {
         ImageView imageView = new ImageView(card.getImage());
@@ -61,7 +60,6 @@ public class Game
                 case HEART:
                     if(heartsSlot.updateValue(card))
                     {
-                        card.setInSlot(true);
                         imageView.setX(heartsSlot.getX());
                         imageView.setY(heartsSlot.getY());
                         turnUnderneath(card);
@@ -70,7 +68,6 @@ public class Game
                 case SPADE:
                     if(spadesSlot.updateValue(card))
                     {
-                        card.setInSlot(true);
                         imageView.setX(spadesSlot.getX());
                         imageView.setY(spadesSlot.getY());
                         turnUnderneath(card);
@@ -79,7 +76,6 @@ public class Game
                 case DIAMOND:
                     if(diamondsSlot.updateValue(card))
                     {
-                        card.setInSlot(true);
                         imageView.setX(diamondsSlot.getX());
                         imageView.setY(diamondsSlot.getY());
                         turnUnderneath(card);
@@ -88,7 +84,6 @@ public class Game
                 case CLUB:
                     if(clubsSlot.updateValue(card))
                     {
-                        card.setInSlot(true);
                         imageView.setX(clubsSlot.getX());
                         imageView.setY(clubsSlot.getY());
                         turnUnderneath(card);
@@ -101,11 +96,16 @@ public class Game
 
         AtomicReference<Double> xError = new AtomicReference<>((double) 0);
         AtomicReference<Double> yError = new AtomicReference<>((double) 0);
+        AtomicReference<Double> pastX = new AtomicReference<>((double) 0);
+        AtomicReference<Double> pastY = new AtomicReference<>((double) 0);
+
         imageView.setOnMousePressed(event -> {
                 // record a delta distance for the drag and drop operation.
                 dragging = true;
                 imageView.toFront();
                 imageView.setCursor(Cursor.MOVE);
+                pastX.set(imageView.getX());
+                pastY.set(imageView.getY());
                 xError.set(event.getSceneX() - imageView.getX());
                 yError.set((event.getSceneY()-50) - imageView.getY());
         });
@@ -113,7 +113,7 @@ public class Game
         imageView.setOnMouseReleased(event -> {
             dragging = false;
             imageView.setCursor(Cursor.HAND);
-            checkCollision(imageView, event.getSceneX());
+            checkCollision(imageView, card, event.getSceneX(), new Point2D(pastX.get(), pastY.get()));
         });
 
         imageView.setOnMouseDragged(event -> {
@@ -129,7 +129,7 @@ public class Game
         return imageView;
     }
 
-    private void checkCollision(ImageView imageView, double x)
+    private void checkCollision(ImageView imageView, Card card, double x, Point2D pastPosition)
     {
         double tolerance = 68;
 
@@ -137,11 +137,25 @@ public class Game
         {
             if(x >= column.getX() && x <= column.getX() + tolerance)
             {
-                imageView.setX(column.getX());
-                imageView.setY(cardImageViewHashMap.get(
-                        column.cards.get(column.cards.size()-1))
-                                                   .getY()+separatorWidth);
+                if(column.cards.get(column.cards.size()-1).canPutBelow(card))
+                {
+                    imageView.setX(column.getX());
+                    imageView.setY(cardImageViewHashMap.get(
+                            column.cards.get(column.cards.size() - 1))
+                                                       .getY() + separatorWidth);
+                    turnUnderneath(card);
+                }
+                else
+                {
+                    imageView.setX(pastPosition.getX());
+                    imageView.setY(pastPosition.getY());
+                }
                 break;
+            }
+            else
+            {
+                imageView.setX(pastPosition.getX());
+                imageView.setY(pastPosition.getY());
             }
         }
     }
@@ -184,7 +198,7 @@ public class Game
         column.cards.remove(card);
         if(column.cards.size() != 1)
         {
-            column.cards.get(column.cards.size() - 1).setFacing(true);
+            column.cards.get(column.cards.size() - 1).setFacing();
             cardImageViewHashMap.get(column.cards.get(column.cards.size() - 1)).setImage(column.cards.get(column.cards.size() - 1).getImage());
         }
     }
@@ -247,7 +261,7 @@ public class Game
         {
             if(i < 1)
             {
-                cards.get(i).setFacing(true);
+                cards.get(i).setFacing();
                 ImageView imageView = setImageViewer(cards.get(i), column1.getPoint());
                 addCardToField(i, imageView, column1);
             }
@@ -255,7 +269,7 @@ public class Game
             {
                 if(i == 2)
                 {
-                    cards.get(i).setFacing(true);
+                    cards.get(i).setFacing();
                 }
                 Point2D point = column2.getPoint();
                 ImageView imageView = setImageViewer(cards.get(i), point.add(0, i == 1 ? 0 : onField.get(i - 1).getY() - column1.getY() + separatorWidth));
@@ -265,7 +279,7 @@ public class Game
             {
                 if(i == 5)
                 {
-                    cards.get(i).setFacing(true);
+                    cards.get(i).setFacing();
                 }
                 Point2D point = column3.getPoint();
                 ImageView imageView = setImageViewer(cards.get(i), point.add(0, i == 3 ? 0 : onField.get(i - 1).getY() - column1.getY() + separatorWidth));
@@ -275,7 +289,7 @@ public class Game
             {
                 if(i == 9)
                 {
-                    cards.get(i).setFacing(true);
+                    cards.get(i).setFacing();
                 }
                 Point2D point = column4.getPoint();
                 ImageView imageView = setImageViewer(cards.get(i), point.add(0, i == 6 ? 0 : onField.get(i - 1).getY() - column1.getY() + separatorWidth));
@@ -285,7 +299,7 @@ public class Game
             {
                 if(i == 14)
                 {
-                    cards.get(i).setFacing(true);
+                    cards.get(i).setFacing();
                 }
                 Point2D point = column5.getPoint();
                 ImageView imageView = setImageViewer(cards.get(i), point.add(0, i == 10 ? 0 : onField.get(i - 1).getY() - column1.getY() + separatorWidth));
@@ -295,7 +309,7 @@ public class Game
             {
                 if(i == 20)
                 {
-                    cards.get(i).setFacing(true);
+                    cards.get(i).setFacing();
                 }
                 Point2D point = column6.getPoint();
                 ImageView imageView = setImageViewer(cards.get(i), point.add(0, i == 15 ? 0 : onField.get(i - 1).getY() - column1.getY() + separatorWidth));
@@ -305,7 +319,7 @@ public class Game
             {
                 if(i == 27)
                 {
-                    cards.get(i).setFacing(true);
+                    cards.get(i).setFacing();
                 }
                 Point2D point = column7.getPoint();
                 ImageView imageView = setImageViewer(cards.get(i), point.add(0, i == 21 ? 0 : onField.get(i - 1).getY() - column1.getY() + 20));
